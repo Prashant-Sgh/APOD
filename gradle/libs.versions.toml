@@ -13,6 +13,10 @@ viewmodel = "2.9.1"
 coil = "3.2.0"
 coilNetwork = "3.2.0"
 compose = "1.8.3"
+navigationRuntimeAndroid = "2.9.1"
+navigationComposeJvmstubs = "2.9.1"
+nav = "2.9.1"
+#lifecycle = "2.9.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,6 +40,12 @@ converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "viewmodel" }
 coil = {module = "io.coil-kt.coil3:coil-compose", version.ref = "coil"}
 coil-network = {module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetwork"}
+androidx-navigation-runtime-android = { group = "androidx.navigation", name = "navigation-runtime-android", version.ref = "navigationRuntimeAndroid" }
+androidx-navigation-compose-jvmstubs = { group = "androidx.navigation", name = "navigation-compose-jvmstubs", version.ref = "navigationComposeJvmstubs" }
+compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
+compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "nav" }
+#lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

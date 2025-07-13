@@ -15,45 +15,49 @@ import androidx.compose.ui.tooling.preview.Preview
 //import com.atul.apodretrofit.ui.theme.APODretrofitTheme
 import android.media.Image
 import androidx.activity.viewModels
+import com.atul.apodretrofit.navigation.AppNavHost
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-//                    Greeting(
-//                        name = "Android",
-//                        modifier = Modifier.padding(innerPadding)
-//                    )
-                    Box(
-                        modifier = Modifier.padding(innerPadding)
-                    ){
-                        ApodScreen().ApodScreen()
-                    }
-                }
+                AppNavHost()
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    APODretrofitTheme {
-//        Greeting("Android")
+//class MainActivity : ComponentActivity() {
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        enableEdgeToEdge()
+//        setContent {
+//                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+////                    Greeting(
+////                        name = "Android",
+////                        modifier = Modifier.padding(innerPadding)
+////                    )
+//                    Box(
+//                        modifier = Modifier.padding(innerPadding)
+//                    ){
+//                        ApodScreen().ApodScreen()
+//                    }
+//                }
+//        }
 //    }
 //}
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun PreviewThis() {
-//    ApodScreen()
-}
+//@Composable
+//fun Greeting(name: String, modifier: Modifier = Modifier) {
+//    Text(
+//        text = "Hello $name!",
+//        modifier = modifier
+//    )
+//}
+
+//
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//private fun PreviewThis() {
+////    ApodScreen()
+//}
