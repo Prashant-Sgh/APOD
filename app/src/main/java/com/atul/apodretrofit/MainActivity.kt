@@ -22,6 +22,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
                 AppNavHost()
+//              ApodScreen().ApodScreen()
         }
     }
 }
