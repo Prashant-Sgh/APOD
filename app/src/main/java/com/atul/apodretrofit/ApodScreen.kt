@@ -32,7 +32,7 @@ class ApodScreen (){
 @SuppressLint("NotConstructor")
 @Composable
 fun ApodScreen(viewModel: ApodViewModel = viewModel()) {
-    val item = viewModel.apodItem
+    val items = viewModel.apodItems
     val error = viewModel.hasError
 
     Column(
@@ -46,11 +46,11 @@ fun ApodScreen(viewModel: ApodViewModel = viewModel()) {
                 color = Color.Red,
                 style = MaterialTheme.typography.bodyLarge
             )
-        } else if (item != null) {
+        } else if (items != null) {
 
                     AsyncImage(
                         model = ImageRequest.Builder(LocalPlatformContext.current)
-                            .data(if (item.media_type == "image") item.url else item.hdurl)
+                            .data(if (items[0].media_type == "image") items[0].url else items[0].hdurl)
                             .listener(onError = { request, result ->
                                 Log.e("CoilError", "Failed to load image: ${result.throwable.message}")
                                 // You can inspect result.throwable for more details
@@ -58,7 +58,7 @@ fun ApodScreen(viewModel: ApodViewModel = viewModel()) {
                             .build(),
                         placeholder = painterResource(R.drawable.ic_launcher_foreground),
                         error = painterResource(R.drawable.ic_launcher_foreground),
-                        contentDescription = item.title ?: "NASA Astronomy Image",
+                        contentDescription = items[0].title ?: "NASA Astronomy Image",
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(250.dp)
@@ -68,12 +68,12 @@ fun ApodScreen(viewModel: ApodViewModel = viewModel()) {
                     )
 
             Text(
-                text = item.title ,
+                text = items[0].title ,
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             Text(
-                text =  item.url + "           " + item.hdurl + "           " + item.explanation,
+                text =  items[0].url + "           " + items[0].hdurl + "           " + items[0].explanation,
                 style = MaterialTheme.typography.bodyMedium
             )
         } else {
