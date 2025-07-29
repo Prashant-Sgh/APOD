@@ -1,11 +1,13 @@
 package com.atul.apodretrofit.ui.screens.home
 
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.atul.apodretrofit.model.APODapiItem
 import com.atul.apodretrofit.model.GridItem
 
 data class HomeGridUiState(
-    val isLoading: Boolean = false,
-//    val items: List<GridItem> = emptyList(),
-    val items: List<APODapiItem> = emptyList(),
-    val error: String? = null
+    var isLoading: Boolean = false,
+//    val items: List<APODapiItem> = emptyList(),
+    var items: SnapshotStateList<APODapiItem> = mutableStateListOf(),
+    var error: String? = null
 )

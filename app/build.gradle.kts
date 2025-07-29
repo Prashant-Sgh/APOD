@@ -1,7 +1,10 @@
+import org.jetbrains.kotlin.gradle.plugin.KaptExtension
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -37,6 +40,14 @@ android {
     buildFeatures {
         compose = true
     }
+    configurations.all {
+        resolutionStrategy {
+            force("org.jetbrains:annotations:23.0.0")
+        }
+    }
+    kapt {
+        correctErrorTypes = true
+    }
 }
 
 dependencies {
@@ -49,6 +60,10 @@ dependencies {
     implementation(libs.compose.foundation)
     implementation(libs.compose.runtime)
     implementation(libs.navigation.compose)
+    implementation(libs.androidx.datastore)
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
+    implementation(libs.lottie.compose)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
