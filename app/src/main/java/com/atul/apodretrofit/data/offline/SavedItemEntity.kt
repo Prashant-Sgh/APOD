@@ -10,5 +10,5 @@ data class SavedItemEntity(
     val hdurl: String,
     val media_type: String,
     val title: String,
-    val url: String
+    var url: String
 )
