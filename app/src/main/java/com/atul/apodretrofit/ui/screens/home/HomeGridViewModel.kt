@@ -3,12 +3,8 @@ package com.atul.apodretrofit.ui.screens.home
 import android.content.Context
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.atul.apodretrofit.data.offline.SavedItemDatabase
@@ -16,9 +12,7 @@ import com.atul.apodretrofit.data.offline.SavedItemEntity
 import com.atul.apodretrofit.data.offline.SavedItemRepository
 import com.atul.apodretrofit.model.APODapiItem
 import com.atul.apodretrofit.model.DataStoreManager
-import com.atul.apodretrofit.model.GridItem
 import com.atul.apodretrofit.model.RetrofitInstance
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -31,14 +25,14 @@ import java.time.format.DateTimeFormatter
 
 class HomeGridViewModel(
     private val dataStoreManager: DataStoreManager,
-    private val context: Context
+    context: Context
 ) : ViewModel() {
+
+    val database = SavedItemDatabase.getInstance(context)
+    val repository = SavedItemRepository(database.savedItemDao(), context)
 
     private val _isDark = MutableStateFlow(false)
     val isDark: StateFlow<Boolean> = _isDark
-
-    val database = SavedItemDatabase.getInstance(context)
-    val repository = SavedItemRepository(database.savedItemDao())
 
     val _containAllSavedItems = repository.getAllSavedItems().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     val containAllSavedItems: StateFlow<List<SavedItemEntity>> = _containAllSavedItems
@@ -90,9 +84,8 @@ class HomeGridViewModel(
     }
 
     fun toggleSavedItem(APODitem: APODapiItem) {
-        val item: SavedItemEntity = SavedItemEntity(APODitem.date, APODitem.explanation, APODitem.hdurl, APODitem.media_type, APODitem.title, APODitem.url)
+        val item = SavedItemEntity(APODitem.date, APODitem.explanation, APODitem.hdurl, APODitem.media_type, APODitem.title, APODitem.url)
         viewModelScope.launch {
-            val isSaved = repository.isItemSaved(APODitem.date)
             if (_containAllSavedItems.value.toMutableList().any {it.date == APODitem.date}) {
                 repository.deleteItemByDate(item.date)
             }
