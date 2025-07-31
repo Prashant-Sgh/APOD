@@ -37,11 +37,11 @@ class MainActivity : ComponentActivity() {
 
             APODretrofitTheme(darkTheme = darkMode) {
                 Scaffold(
-                    topBar = { if(currentDestinationRoute !in listOf(NavRoutes.Detail, NavRoutes.Offline))  {
+                    topBar = { if(currentDestinationRoute !in listOf(NavRoutes.Detail, NavRoutes.Offline, NavRoutes.OfflineDetail))  {
                         TopBar(homeGridViewModel)
                     }
                              },
-                    bottomBar = { if(currentDestinationRoute !in listOf(NavRoutes.Detail)) {
+                    bottomBar = { if(currentDestinationRoute !in listOf(NavRoutes.Detail, NavRoutes.OfflineDetail)) {
                         BottomBar(navController)
                         } }
                 ) {
