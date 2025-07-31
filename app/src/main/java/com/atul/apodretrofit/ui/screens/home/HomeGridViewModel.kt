@@ -34,7 +34,7 @@ class HomeGridViewModel(
     private val _isDark = MutableStateFlow(false)
     val isDark: StateFlow<Boolean> = _isDark
 
-    val _containAllSavedItems = repository.getAllSavedItems().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val _containAllSavedItems = repository.getAllSavedItems().stateIn(viewModelScope, SharingStarted.WhileSubscribed(2000), emptyList())
     val containAllSavedItems: StateFlow<List<SavedItemEntity>> = _containAllSavedItems
 
 //    fun isSelectedItemSaved(item: APODapiItem?): Boolean = item != null && _containAllSavedItems.value.toMutableList().any{it.date == item.date}
@@ -57,6 +57,11 @@ class HomeGridViewModel(
     fun deleteAllItems() {
         viewModelScope.launch {
             repository.deleteAllSavedItems()
+        }
+    }
+    fun deleteSingleItem(date: String) {
+        viewModelScope.launch {
+            repository.deleteItemByDate(date)
         }
     }
 
@@ -84,7 +89,7 @@ class HomeGridViewModel(
     }
 
     fun toggleSavedItem(APODitem: APODapiItem) {
-        val item = SavedItemEntity(APODitem.date, APODitem.explanation, APODitem.hdurl, APODitem.media_type, APODitem.title, APODitem.url)
+        val item = SavedItemEntity(APODitem.date, APODitem.explanation, APODitem.hdurl ?: APODitem.url ?: "", APODitem.media_type, APODitem.title, APODitem.url ?: "")
         viewModelScope.launch {
             if (_containAllSavedItems.value.toMutableList().any {it.date == APODitem.date}) {
                 repository.deleteItemByDate(item.date)
@@ -105,7 +110,7 @@ class HomeGridViewModel(
 
 //    val pastDays = mutableLongStateOf(10)
 
-    var pastDays by mutableStateOf(9L)
+    var pastDays by mutableStateOf(5L)
         private set
 
     fun updatePastDays(newDays: Long) {
@@ -120,7 +125,7 @@ class HomeGridViewModel(
         viewModelScope.launch {
             try {
 //                _uiState.value = _uiState.value.copy(isLoading = true)
-                _uiState.value.isLoading = false
+//                _uiState.value.isLoading = false
                 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
                 val today = LocalDate.now()
@@ -130,10 +135,20 @@ class HomeGridViewModel(
                 val response = RetrofitInstance.api.getApod("***REMOVED***", startDate.format(formatter), endDate.format(formatter))
 
                 val newItems = response.reversed()
-                val combinedItems = _uiState.value.items + newItems
 
-                _uiState.value.items.addAll(combinedItems)
-                _uiState.value.error = null
+//                val combinedItems = _uiState.value.items + newItems
+//                _uiState.value.items.addAll(combinedItems)
+
+                val updatedItems = (_uiState.value.items + newItems).distinctBy { it.date } // removes duplicates by date
+                _uiState.value.items.clear()
+                _uiState.value.items.addAll(updatedItems)
+
+//                _uiState.value.error = null
+
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = null
+                )
 
             }
             catch (e: Exception) {

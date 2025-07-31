@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
                         TopBar(homeGridViewModel)
                     }
                              },
-                    bottomBar = { if(currentDestinationRoute !in listOf(NavRoutes.Detail, NavRoutes.Offline)) {
+                    bottomBar = { if(currentDestinationRoute !in listOf(NavRoutes.Detail)) {
                         BottomBar(navController)
                         } }
                 ) {

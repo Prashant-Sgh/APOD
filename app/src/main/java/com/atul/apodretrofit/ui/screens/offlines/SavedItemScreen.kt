@@ -1,5 +1,6 @@
 package com.atul.apodretrofit.ui.screens.offlines
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.MutableTransitionState
@@ -30,7 +31,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Card
@@ -40,12 +43,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -72,6 +78,7 @@ import com.atul.apodretrofit.navigation.NavRoutes
 import com.atul.apodretrofit.ui.screens.home.HomeGridViewModel
 import com.atul.apodretrofit.ui.screens.home.TopBar
 import kotlinx.coroutines.launch
+import java.io.File
 
 @OptIn(
     ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -83,7 +90,11 @@ fun SavedItemsScreen(
 
     val items by viewModel.containAllSavedItems.collectAsState()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
                 TopAppBar (title = {
                     Row(
@@ -97,6 +108,9 @@ fun SavedItemsScreen(
                             contentDescription = "Delete all",
                             modifier = Modifier.clickable {
                                 viewModel.deleteAllItems()
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("All Items deleted")
+                                }
                             }
                         )
                     }
@@ -105,7 +119,7 @@ fun SavedItemsScreen(
         }
     ) { paddingValues ->
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 120.dp),
+            columns = GridCells.Fixed(3),
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize(),
@@ -117,7 +131,12 @@ fun SavedItemsScreen(
                 OfflineGridItemCard(item = items[index], onClick = {
                     viewModel.offlineSelectedItem(items[index])
                     navController.navigate(NavRoutes.Detail)
-                }, isSaved = true, onClickSave = { })
+                }, isSaved = true, onClickSave = {
+                    viewModel.deleteSingleItem(items[index].date)
+                    scope.launch {
+                        snackbarHostState.showSnackbar("${items[index].date} of item deleted")
+                    }
+                })
             }
         }
     }
@@ -157,19 +176,41 @@ fun OfflineGridItemCard(item: SavedItemEntity, onClick: () -> Unit, isSaved: Boo
                         .fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(item.url)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = item.title,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .clip(RoundedCornerShape(10.dp)),
-                        placeholder = painterResource(id = R.drawable.ic_launcher_foreground),
-                        contentScale = ContentScale.Crop
-                    )
+                    val isFileLocal = item.url.startsWith("file://") == true || item.url.startsWith("/") == true
+
+                    if (isFileLocal) {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(File(item.url))
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = item.title,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .clip(RoundedCornerShape(10.dp)),
+                            placeholder = painterResource(id = R.drawable.ic_launcher_foreground),
+                            contentScale = ContentScale.Crop,
+                            onError = {
+                                Log.d("Error Async image", "ERROR LOADING IMAGE")
+                            }
+                        )
+                    }
+                    else {
+                        // Fallback Icon
+                        Icon(
+                            imageVector = Icons.Filled.Warning,
+                            contentDescription = "No Image Available",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color.LightGray)
+                                .padding(32.dp),
+                            tint = Color.Gray
+                        )
+
+                    }
 
                     Spacer(modifier = Modifier.height(4.dp))
 
@@ -183,7 +224,7 @@ fun OfflineGridItemCard(item: SavedItemEntity, onClick: () -> Unit, isSaved: Boo
                     )
                 }
                 Icon(
-                    imageVector = if (isSaved) Icons.Filled.Star else Icons.Outlined.Star,
+                    imageVector = Icons.Filled.Delete ,
                     contentDescription = "Save icon",
                     modifier = Modifier
                         .size(30.dp)

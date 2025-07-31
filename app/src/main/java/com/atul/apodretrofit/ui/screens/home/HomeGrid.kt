@@ -49,6 +49,13 @@ import com.atul.apodretrofit.R
 import com.atul.apodretrofit.navigation.NavRoutes
 import com.atul.apodretrofit.ui.screens.detail.DetailScreenViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -78,7 +85,12 @@ fun HomeGridScreen(
     } else if (state.error != null) {
         Text("Error: ${state.error}")
     } else {
-        Scaffold { paddingValues ->
+        val snackbarHostState = remember { SnackbarHostState() }
+        val scope = rememberCoroutineScope()
+
+        Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+        ) { paddingValues ->
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier
@@ -89,19 +101,25 @@ fun HomeGridScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(state.items) { item ->
-                    GridItemCard(item = item, onClick = {
-                        viewModel.selectItem(item)
-                        navController.navigate(NavRoutes.Detail)
-                    }, isSaved = false, onClickSave = {
-                        Log.d("ToggleDebug", "Toggling save for item: ${item.date}")
-                        viewModel.toggleSavedItem(item)
-                    })
+                items(state.items, key = { it.date }) { item ->
+
+                    if (item.url != null && item.url?.contains(".png") == false) {
+                        GridItemCard(item = item, onClick = {
+                            viewModel.selectItem(item)
+                            navController.navigate(NavRoutes.Detail)
+                        }, isSaved = false, onClickSave = {
+                            viewModel.toggleSavedItem(item)
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Toggled")
+                            }
+                        })
+                    }
+
                 }
                 item(span = { GridItemSpan(maxCurrentLineSpan) }) {
                     Button(
                         onClick = {
-                            viewModel.updatePastDays(viewModel.pastDays + 10)
+                            viewModel.updatePastDays(viewModel.pastDays + 4)
                             viewModel.loadGridItems(viewModel.pastDays)
 //                            viewModel.loadMoreItems()
                         }, // or whatever your logic is
@@ -151,19 +169,20 @@ fun GridItemCard(item: APODapiItem, onClick: () -> Unit, isSaved: Boolean, onCli
                         .fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(item.url)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = item.title,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .clip(RoundedCornerShape(10.dp)),
-                        placeholder = painterResource(id = R.drawable.ic_launcher_foreground),
-                        contentScale = ContentScale.Crop
-                    )
+
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(item.url)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = item.title,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .clip(RoundedCornerShape(10.dp)),
+                            placeholder = painterResource(id = R.drawable.ic_launcher_foreground),
+                            contentScale = ContentScale.Crop,
+                        )
 
                     Spacer(modifier = Modifier.height(4.dp))
 
@@ -187,7 +206,6 @@ fun GridItemCard(item: APODapiItem, onClick: () -> Unit, isSaved: Boolean, onCli
         }
     }
 }
-
 @Composable
 fun ShimmerCard() {
     val shimmerColors = listOf(
