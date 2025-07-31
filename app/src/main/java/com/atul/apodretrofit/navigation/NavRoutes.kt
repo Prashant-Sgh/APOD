@@ -4,5 +4,6 @@ object NavRoutes {
     const val Home = "home"
     const val Detail = "detail"
 //    const val DetailWithArg = "$Detail/{date}"
-    const val Offline = "Offline"
+const val Offline = "offline"
+    const val OfflineDetail = "offlineDetail"
 }

@@ -2,11 +2,7 @@ package com.atul.apodretrofit.ui.screens.offlines
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -32,13 +28,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -55,28 +48,21 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.atul.apodretrofit.R
 import com.atul.apodretrofit.data.offline.SavedItemEntity
-import com.atul.apodretrofit.model.APODapiItem
 import com.atul.apodretrofit.navigation.NavRoutes
 import com.atul.apodretrofit.ui.screens.home.HomeGridViewModel
-import com.atul.apodretrofit.ui.screens.home.TopBar
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -130,7 +116,7 @@ fun SavedItemsScreen(
             items(items.size) { index ->
                 OfflineGridItemCard(item = items[index], onClick = {
                     viewModel.offlineSelectedItem(items[index])
-                    navController.navigate(NavRoutes.Detail)
+                    navController.navigate(NavRoutes.OfflineDetail)
                 }, isSaved = true, onClickSave = {
                     viewModel.deleteSingleItem(items[index].date)
                     scope.launch {
@@ -234,31 +220,3 @@ fun OfflineGridItemCard(item: SavedItemEntity, onClick: () -> Unit, isSaved: Boo
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-@Composable
-fun SavedItemCard(item: String) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f), // Makes it square
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = item, style = MaterialTheme.typography.bodyMedium)
-        }
-    }
-}
-

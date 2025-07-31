@@ -13,6 +13,7 @@ import com.atul.apodretrofit.data.offline.SavedItemRepository
 import com.atul.apodretrofit.ui.screens.detail.DetailScreen
 import com.atul.apodretrofit.ui.screens.home.HomeGridScreen
 import com.atul.apodretrofit.ui.screens.home.HomeGridViewModel
+import com.atul.apodretrofit.ui.screens.offlines.OfflineDetailScreen
 import com.atul.apodretrofit.ui.screens.offlines.SaveItemViewModelFactory
 import com.atul.apodretrofit.ui.screens.offlines.SavedItemViewModel
 import com.atul.apodretrofit.ui.screens.offlines.SavedItemsScreen
@@ -39,6 +40,9 @@ fun AppNavHost(
         }
         composable(NavRoutes.Offline){
             SavedItemsScreen(viewModel, navController)
+        }
+        composable(NavRoutes.OfflineDetail){
+            OfflineDetailScreen(viewModel, onBack = { navController.popBackStack() })
         }
     }
 }
