@@ -1,6 +1,7 @@
 package com.atul.apodretrofit.ui.screens.detail
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +29,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -35,6 +38,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -56,8 +61,10 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.atul.apodretrofit.R
+import com.atul.apodretrofit.data.offline.SavedItemEntity
 import com.atul.apodretrofit.model.APODapiItem
 import com.atul.apodretrofit.ui.screens.home.HomeGridViewModel
+import kotlinx.coroutines.launch
 
 //@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,8 +75,10 @@ fun DetailScreen(
 ) {
 
     val selectedItem by viewModel.selectedItem.collectAsState()
-
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Detail") },
@@ -79,7 +88,14 @@ fun DetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Handle favorite click */ }) {
+                    IconButton(onClick = {
+                        val item = APODapiItem("copyright", "date", "explanation", "hdurl", "media_type", "service_version", "title", "url")
+                        Log.d("ToggleDebug", "Toggling save for item: ${selectedItem?.date}")
+                            viewModel.toggleSavedItem(selectedItem?: item)
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Toggled")
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.Outlined.FavoriteBorder,
                             contentDescription = "Favorite"
@@ -92,8 +108,6 @@ fun DetailScreen(
     ) { paddingValues ->
 
         val scrollState = rememberScrollState()
-        val lottieComposition by rememberLottieComposition(LottieCompositionSpec.Asset("image_error.json"))
-        val lottieProgress by animateLottieCompositionAsState(lottieComposition)
 
         Column(
             modifier = Modifier
@@ -105,29 +119,6 @@ fun DetailScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-//            AsyncImage(
-//                model = ImageRequest.Builder(LocalContext.current)
-//                    .data(selectedItem?.url)
-//                    .crossfade(true)
-//                    .build(),
-//                contentDescription = "Detail Image",
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(240.dp)
-//                    .clip(RoundedCornerShape(12.dp)),
-//                contentScale = ContentScale.Crop,
-//                onError = {
-//                    // Show Lottie animation fallback
-//                    LottieAnimation(
-//                        composition = lottieComposition,
-//                        progress = { lottieProgress },
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .height(240.dp)
-//                    )
-//                }
-//            )
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -135,9 +126,6 @@ fun DetailScreen(
                     .clip(RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                var isError by remember { mutableStateOf(false) }
-
-                if (!isError) {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(selectedItem?.url)
@@ -145,21 +133,10 @@ fun DetailScreen(
                             .build(),
                         contentDescription = "Detail Image",
                         contentScale = ContentScale.Crop,
+                        placeholder = painterResource(id = R.drawable.ic_launcher_foreground),
                         modifier = Modifier
                             .fillMaxSize(),
-                        onError = {
-                            isError = true
-                        }
                     )
-                }
-
-                if (isError) {
-                    LottieAnimation(
-                        composition = rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.astronaut)).value,
-                        iterations = LottieConstants.IterateForever,
-                        modifier = Modifier.size(150.dp)
-                    )
-                }
             }
 
 
@@ -201,87 +178,46 @@ fun DetailScreen(
                 lineHeight = 20.sp,
                 modifier = Modifier.align(Alignment.Start)
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = "HDURL--", // heading
+                color = Color.Gray,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.align(Alignment.Start)
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = selectedItem?.hdurl ?: "",
+                color = Color.LightGray,
+                fontSize = 15.sp,
+                lineHeight = 20.sp,
+                modifier = Modifier.align(Alignment.Start)
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = "URL--", // heading
+                color = Color.Gray,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.align(Alignment.Start)
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = selectedItem?.url ?: "",
+                color = Color.LightGray,
+                fontSize = 15.sp,
+                lineHeight = 20.sp,
+                modifier = Modifier.align(Alignment.Start)
+            )
         }
     }
 }
-
-
-
-
-
-
-//@Composable
-//fun DetailScreen(viewModel: HomeGridViewModel) {
-//    val selectedItem by viewModel.selectedItem.collectAsState()
-//
-//    val isItemSaved by viewModel.isSelectedItemSaved.collectAsState()
-//
-//    // Safe area using Scaffold or PaddingValues
-////    Scaffold { paddingValues ->
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .verticalScroll(rememberScrollState())
-//                .padding(16.dp) // General padding
-//        ) {
-////             Image from URL using Coil 3
-//            AsyncImage(
-//                model = selectedItem?.url,
-//                contentDescription = "Detail Image",
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(240.dp)
-//                    .clip(RoundedCornerShape(8.dp)),
-//                contentScale = ContentScale.Crop
-//            )
-//
-//            Spacer(modifier = Modifier.height(12.dp))
-//
-//            // Date Text - Small
-//            Text(
-//                text = selectedItem?.date ?: "No data",
-//                style = MaterialTheme.typography.labelSmall,
-//                color = Color.Gray,
-//                modifier = Modifier.padding(bottom = 4.dp)
-//            )
-//
-//            Row(
-//                modifier = Modifier.fillMaxWidth().background(Color(0xFFFFF9C4)).padding(8.dp),
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.SpaceBetween
-//            ){
-//                Text(
-//                    text = selectedItem?.title ?: "No data",
-//                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-//                    modifier = Modifier
-//                        .padding(8.dp)
-//
-//                )
-//
-//                Icon(
-//                    imageVector = if (isItemSaved) (Icons.Default.Favorite) else (Icons.Default.FavoriteBorder),
-//                tint = if (isItemSaved) Color.Red else Color.Black,
-//                    contentDescription = if (isItemSaved) "Saved" else "Not Saved",
-//                    modifier = Modifier.size(30.dp)
-//                )
-//            }
-//
-//            Spacer(modifier = Modifier.height(12.dp))
-//
-//            // Scrollable Explanation Text Area
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .heightIn(min = 200.dp, max = 500.dp)
-//                    .border(1.dp, Color.LightGray, RoundedCornerShape(6.dp))
-//                    .padding(8.dp)
-//                    .verticalScroll(rememberScrollState())
-//            ) {
-//                Text(
-//                    text = ("EXPLANATION:--" +selectedItem?.explanation + "MEDIA TYPE:--" + selectedItem?.media_type + "URL:--" + selectedItem?.url + "HD-URL:--" + selectedItem?.hdurl) ?: "No data",
-//                    style = MaterialTheme.typography.bodyMedium,
-//                    color = Color.DarkGray
-//                )
-//            }
-//        }
-//}

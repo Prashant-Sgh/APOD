@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
+import java.io.File
 
 
 // In simple words this class let us use our DAO interface (SavedItemDao) safely.
@@ -20,14 +21,17 @@ class SavedItemRepository(
 
     // Insert to room and change url to file name --> change this to file *path
     suspend fun insertSingleItem(item: SavedItemEntity) {
-        ourDaoLetUs.insertSingleItem(item)
-
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             val imageBytes = ImageStorageManager.downloadImageBytes(item.url)
-            if (imageBytes != null) {
+            val updatedItem = if (imageBytes != null) {
                 ImageStorageManager.saveImage(context, "${item.date}.jpg", imageBytes)
-                item.url = "${item.date}.jpg"
+                val file = File(context.filesDir, "${item.date}.jpg")
+                item.copy(url = file.absolutePath)
             }
+            else {
+                item
+            }
+            ourDaoLetUs.insertSingleItem(updatedItem)
         }
     }
 
