@@ -88,10 +88,10 @@ class HomeGridViewModel(
         }
     }
 
-    fun toggleSavedItem(APODitem: APODapiItem) {
-        val item = SavedItemEntity(APODitem.date, APODitem.explanation, APODitem.hdurl ?: APODitem.url ?: "", APODitem.media_type, APODitem.title, APODitem.url ?: "")
+    fun toggleSavedItem(item: SavedItemEntity) {
+//        val item = SavedItemEntity(APODitem.date, APODitem.explanation, APODitem.hdurl ?: APODitem.url ?: "", APODitem.media_type, APODitem.title, APODitem.url ?: "")
         viewModelScope.launch {
-            if (_containAllSavedItems.value.toMutableList().any {it.date == APODitem.date}) {
+            if (_containAllSavedItems.value.toMutableList().any {it.date == item.date}) {
                 repository.deleteItemByDate(item.date)
             }
             else {
@@ -110,7 +110,7 @@ class HomeGridViewModel(
 
 //    val pastDays = mutableLongStateOf(10)
 
-    var pastDays by mutableStateOf(5L)
+    var pastDays by mutableStateOf(7L)
         private set
 
     fun updatePastDays(newDays: Long) {
@@ -132,14 +132,16 @@ class HomeGridViewModel(
                 val endDate = today.minusDays(1)
                 val startDate = endDate.minusDays(pastDays)
 
-                val response = RetrofitInstance.api.getApod("***REMOVED***", startDate.format(formatter), endDate.format(formatter))
+                val response = RetrofitInstance.api.getApod("UmrDcezv256EGi2G3FcpJxfNF5k2enNzEvUMQYEA", startDate.format(formatter), endDate.format(formatter))
 
                 val newItems = response.reversed()
 
 //                val combinedItems = _uiState.value.items + newItems
 //                _uiState.value.items.addAll(combinedItems)
 
-                val updatedItems = (_uiState.value.items + newItems).distinctBy { it.date } // removes duplicates by date
+                val updatedItems = (_uiState.value.items + newItems)
+                    .filter { it.url != null && it.url?.contains(".png") == false }
+                    .distinctBy { it.date } // removes duplicates by date
                 _uiState.value.items.clear()
                 _uiState.value.items.addAll(updatedItems)
 

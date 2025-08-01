@@ -35,14 +35,15 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val currentDestinationRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
+            val isDarkTheme = homeGridViewModel.isDark
             APODretrofitTheme(darkTheme = darkMode) {
                 Scaffold(
                     topBar = { if(currentDestinationRoute !in listOf(NavRoutes.Detail, NavRoutes.Offline, NavRoutes.OfflineDetail))  {
-                        TopBar(homeGridViewModel)
+                        TopBar(isDarkTheme = isDarkTheme, onThemeToggle = { homeGridViewModel.toggleTheme(this) })
                     }
                              },
                     bottomBar = { if(currentDestinationRoute !in listOf(NavRoutes.Detail, NavRoutes.OfflineDetail)) {
-                        BottomBar(navController)
+                        BottomBar(isDarkTheme = isDarkTheme, navController = navController)
                         } }
                 ) {
                     Box(modifier = Modifier.padding(it))

@@ -42,7 +42,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.atul.apodretrofit.R
-import com.atul.apodretrofit.model.APODapiItem
+import com.atul.apodretrofit.data.offline.SavedItemEntity
 import com.atul.apodretrofit.ui.screens.home.HomeGridViewModel
 import kotlinx.coroutines.launch
 
@@ -69,8 +69,8 @@ fun DetailScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        val item = APODapiItem("copyright", "date", "explanation", "hdurl", "media_type", "service_version", "title", "url")
-                        viewModel.toggleSavedItem(selectedItem?: item)
+                        val toggleItem = SavedItemEntity(selectedItem?.date ?: "", selectedItem?.explanation ?: "", selectedItem?.hdurl ?: "", selectedItem?.media_type ?: "", selectedItem?.title ?: "", selectedItem?.url ?: "")
+                        viewModel.toggleSavedItem(toggleItem)
                         scope.launch {
                             snackbarHostState.showSnackbar("Toggled")
                         }
