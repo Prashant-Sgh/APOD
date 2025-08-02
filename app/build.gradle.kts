@@ -1,4 +1,9 @@
-import org.jetbrains.kotlin.gradle.plugin.KaptExtension
+import java.util.Properties
+
+val localProperties = Properties().apply {
+    load(rootProject.file("local.properties").inputStream())
+}
+val apiKey = localProperties["NASA_API_KEY"] as String
 
 plugins {
     alias(libs.plugins.android.application)
@@ -19,6 +24,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "NASA_API_KEY", "\"$apiKey\"")
     }
 
     buildTypes {
@@ -39,6 +45,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     configurations.all {
         resolutionStrategy {

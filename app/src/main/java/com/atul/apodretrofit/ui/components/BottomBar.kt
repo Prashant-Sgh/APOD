@@ -26,6 +26,7 @@ fun BottomBar(isDarkTheme: StateFlow<Boolean>, navController: NavController) {
         containerColor = if (isDark) Color(0xFF0F172A) else Color(0xFFDCDCDC),
         contentColor = if(isDark) Color.White else Color(0xFFDCDCDC),
         actions = {
+            Spacer(modifier = Modifier.weight(0.2f))
             IconButton(onClick = {
                 if (currentDestinationRoute != NavRoutes.Home) {
                     navController.navigate(NavRoutes.Home) {
@@ -39,7 +40,7 @@ fun BottomBar(isDarkTheme: StateFlow<Boolean>, navController: NavController) {
             }) {
                 Icon(Icons.Default.Home, contentDescription = "Home")
             }
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.6f))
             IconButton(onClick = {
                 if (currentDestinationRoute != NavRoutes.Offline) {
                     navController.navigate(NavRoutes.Offline) {
@@ -53,6 +54,7 @@ fun BottomBar(isDarkTheme: StateFlow<Boolean>, navController: NavController) {
             }) {
                 Icon(Icons.Default.Star, contentDescription = "Favorites")
             }
+            Spacer(modifier = Modifier.weight(0.2f))
         }
     )
 }
