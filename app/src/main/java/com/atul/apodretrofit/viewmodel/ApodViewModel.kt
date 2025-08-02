@@ -35,7 +35,7 @@ class ApodViewModel : ViewModel() {
                 val endDate = today
                 val startDate = endDate.minusDays(9)
 
-                val response = RetrofitInstance.api.getApod("UmrDcezv256EGi2G3FcpJxfNF5k2enNzEvUMQYEA", startDate.format(formatter), endDate.format(formatter))
+                val response = RetrofitInstance.api.getApod(startDate =  startDate.format(formatter), endDate =  endDate.format(formatter))
 
 //                Log.d("ApodViewModel", "Requesting from ${startDate.format(formatter)} to ${endDate.format(formatter)}")
 //                Log.d("ApodViewModel", "Error fetching APOD list xxxxxxxxxxxxxxxxxxx : $response  ${startDate.format(formatter)}  ${endDate.format(formatter)}")
