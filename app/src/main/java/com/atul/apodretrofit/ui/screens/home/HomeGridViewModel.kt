@@ -132,7 +132,7 @@ class HomeGridViewModel(
                 val endDate = today.minusDays(1)
                 val startDate = endDate.minusDays(pastDays)
 
-                val response = RetrofitInstance.api.getApod("***REMOVED***", startDate.format(formatter), endDate.format(formatter))
+                val response = RetrofitInstance.api.getApod( startDate = startDate.format(formatter), endDate =  endDate.format(formatter))
 
                 val newItems = response.reversed()
 
