@@ -52,7 +52,7 @@ fun BottomBar(isDarkTheme: StateFlow<Boolean>, navController: NavController) {
                     }
                 }
             }) {
-                Icon(Icons.Default.Star, contentDescription = "Favorites")
+                Icon(Icons.Default.Star, contentDescription = "Favorites", tint = if (isDark) Color.Black else Color.White)
             }
             Spacer(modifier = Modifier.weight(0.2f))
         }
