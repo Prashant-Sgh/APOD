@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -74,28 +75,38 @@ class HomeGridViewModel(
     private val _offlineSelectedItem = MutableStateFlow<SavedItemEntity?>(null)
     val offlineSelectedItem: StateFlow<SavedItemEntity?> = _offlineSelectedItem
 
+    private val _isSaved = MutableStateFlow(false)
+    val isSaved: StateFlow<Boolean> = _isSaved
 
-    val isSelectedItemSaved : StateFlow<Boolean> = combine(
-        selectedItem, containAllSavedItems
-    ) {
-            selected, savedItems -> selected != null && savedItems.any {it.date == selected.date}
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+//    val isSelectedItemSaved : StateFlow<Boolean> = combine(
+//        selectedItem, containAllSavedItems
+//    ) {
+//            selected, savedItems -> selected != null && savedItems.any {it.date == selected.date}
+//    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(1000), true)
 
-    fun checkItemSaved(item: APODapiItem, onResult: (Boolean) -> Unit) {
+    private val _savedItems = MutableStateFlow<Set<String>>(emptySet())
+    val savedItems: StateFlow<Set<String>> = _savedItems
+
+    fun checkItemSaved(date: String) {
         viewModelScope.launch {
-            val isSaved = repository.isItemSaved(item.date)
-            onResult(isSaved)
+            val saved = repository.isItemSaved(date)
+            _isSaved.value = saved
+            _savedItems.update { current ->
+                if (saved) current + date else current - date
+            }
         }
     }
 
+
     fun toggleSavedItem(item: SavedItemEntity) {
-//        val item = SavedItemEntity(APODitem.date, APODitem.explanation, APODitem.hdurl ?: APODitem.url ?: "", APODitem.media_type, APODitem.title, APODitem.url ?: "")
         viewModelScope.launch {
             if (_containAllSavedItems.value.toMutableList().any {it.date == item.date}) {
                 repository.deleteItemByDate(item.date)
+                checkItemSaved(item.date)
             }
             else {
                 repository.insertSingleItem(item)
+                checkItemSaved(item.date)
             }
         }
     }
@@ -106,6 +117,12 @@ class HomeGridViewModel(
 
     fun offlineSelectedItem(item: SavedItemEntity) {
         _offlineSelectedItem.value = item
+    }
+
+    val emptyEntity = SavedItemEntity("", "", "", "", "", "")
+
+    fun getSaveEntity(item: APODapiItem): SavedItemEntity {
+        return SavedItemEntity(item.date, item.explanation, item.hdurl, item.media_type, item.title, item.url)
     }
 
 //    val pastDays = mutableLongStateOf(10)

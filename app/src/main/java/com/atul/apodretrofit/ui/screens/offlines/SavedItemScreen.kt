@@ -56,9 +56,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.crossfade
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+//import coil.request.crossfade
 import com.atul.apodretrofit.R
 import com.atul.apodretrofit.data.offline.SavedItemEntity
 import com.atul.apodretrofit.navigation.NavRoutes

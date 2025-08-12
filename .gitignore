@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+cosmos-release-key.jks
+keystore.properties

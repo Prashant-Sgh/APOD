@@ -16,7 +16,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -24,7 +25,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -33,20 +38,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
+import coil.compose.AsyncImage
 import com.atul.apodretrofit.data.offline.SavedItemEntity
 import com.atul.apodretrofit.model.APODapiItem
 
 @Composable
 fun HomeScreen(
+    viewModel: HomeGridViewModel,
     uiState: State<HomeGridUiState>,
     onToggleSaved: (SavedItemEntity) -> Unit,
+//    isItemSaved: (String) -> Unit,
     onItemClick: (APODapiItem) -> Unit,
     isDarkTheme: State<Boolean>,
     onShowMore: () -> Unit
 ) {
     val isDarkTheme = isDarkTheme.value
     val uiState by uiState
+
+    val primaryTextColor = if (isDarkTheme) Color.White else Color.Black
 
     Column(
         modifier = Modifier
@@ -58,14 +67,21 @@ fun HomeScreen(
             columns = GridCells.Fixed(2),
             verticalArrangement = Arrangement.spacedBy(15.dp),
             horizontalArrangement = Arrangement.spacedBy(15.dp),
-            modifier = Modifier.weight(1f).padding(vertical = 15.dp)
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = 15.dp)
         ) {
             items(uiState.items) { item ->
+
+                var isSaved by remember { mutableStateOf(false) }
+//                viewModel.checkItemSaved(item.date)
                 ApodCard(
                     item = item,
                     isDarkTheme = isDarkTheme,
                     onToggleSaved = onToggleSaved,
-                    onItemClick = onItemClick
+                    onItemClick = onItemClick,
+                    viewModel = viewModel,
+//                    isItemSaved = isSaved
                 )
             }
 
@@ -102,10 +118,24 @@ fun ApodCard(
     item: APODapiItem,
     isDarkTheme: Boolean,
     onToggleSaved: (SavedItemEntity) -> Unit,
-    onItemClick: (APODapiItem) -> Unit
+    onItemClick: (APODapiItem) -> Unit,
+    viewModel: HomeGridViewModel,
+//    isItemSaved: Boolean,
 ) {
     val bgColor = if (isDarkTheme) Color(0xFF172A46) else Color(0xFFF1F5F9)
     val textColor = if (isDarkTheme) Color.White else Color.Black
+    val primaryTextColor = if (isDarkTheme) Color.White else Color.Black
+
+//    var isSaved by remember { mutableStateOf(false) }
+
+    viewModel.checkItemSaved(item.date)
+    val savedItems by viewModel.savedItems.collectAsState()
+    val isSaved = savedItems.contains(item.date)
+
+//    LaunchedEffect(Unit) {
+//        viewModel.checkItemSaved(item.date)
+//        isSaved = viewModel.isSaved.value
+//    }
 
     Box(
         modifier = Modifier
@@ -138,14 +168,14 @@ fun ApodCard(
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(onClick = {
-                    val toggleItem = SavedItemEntity(item.date, item.explanation, item.hdurl, item.media_type, item.title, item.url)
+                    val toggleItem = viewModel.getSaveEntity(item)
                     onToggleSaved(toggleItem)
+//                    isSaved = !isSaved
                 }) {
                     Icon(
-//                        imageVector = if (item.isSaved) Icons.Default.Star else Icons.Default.StarBorder,
-                        imageVector = Icons.Outlined.Star,
+                        imageVector = if (isSaved) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = "Save",
-                        tint = Color.White
+                        tint = primaryTextColor
                     )
                 }
             }

@@ -3,6 +3,11 @@ import java.util.Properties
 val localProperties = Properties().apply {
     load(rootProject.file("local.properties").inputStream())
 }
+
+val keystoreProperties = Properties().apply {
+    load(rootProject.file("keystore.properties").inputStream())
+}
+
 val apiKey = localProperties["NASA_API_KEY"] as String
 
 plugins {
@@ -17,9 +22,20 @@ android {
     namespace = "com.atul.apodretrofit"
     compileSdk = 35
 
+    signingConfigs {
+        create("release") {
+//            storeFile = file(keystoreProperties["storeFile"] as String)
+            storeFile = keystoreProperties["storeFile"]?.let { file(it as String) }
+            storePassword = keystoreProperties["storePassword"] as String
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+        }
+    }
+
     defaultConfig {
         applicationId = "com.atul.apodretrofit"
-        minSdk = 28
+//        minSdk = 28
+        minSdk = 21
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -35,11 +51,13 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -55,16 +73,21 @@ android {
     }
     kapt {
         correctErrorTypes = true
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
     }
 }
 
 dependencies {
 
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.coil)
-    implementation(libs.coil.network)
+//    implementation(libs.coil.network)
     implementation(libs.compose.foundation)
     implementation(libs.compose.runtime)
     implementation(libs.navigation.compose)
@@ -73,7 +96,7 @@ dependencies {
     kapt(libs.androidx.room.compiler)
     implementation(libs.lottie.compose)
 
-    //FIREBASE
+    //FIREBASEe
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
 

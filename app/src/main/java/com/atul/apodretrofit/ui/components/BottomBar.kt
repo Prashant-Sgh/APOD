@@ -17,46 +17,82 @@ import com.atul.apodretrofit.navigation.NavRoutes
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun BottomBar(isDarkTheme: StateFlow<Boolean>, navController: NavController) {
+fun BottomBar(
+    isDarkTheme: StateFlow<Boolean>,
+    navController: NavController
+) {
 
     val currentDestinationRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     val isDark = isDarkTheme.collectAsState().value
-
-    BottomAppBar(
-        containerColor = if (isDark) Color(0xFF0F172A) else Color(0xFFDCDCDC),
-        contentColor = if(isDark) Color.White else Color(0xFFDCDCDC),
-        actions = {
-            Spacer(modifier = Modifier.weight(0.2f))
-            IconButton(onClick = {
-                if (currentDestinationRoute != NavRoutes.Home) {
-                    navController.navigate(NavRoutes.Home) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
+    val onHomeClick = {
+        if (currentDestinationRoute != NavRoutes.Home) {
+            navController.navigate(NavRoutes.Home) {
+                popUpTo(navController.graph.startDestinationId) {
+                    saveState = true
                 }
-            }) {
-                Icon(Icons.Default.Home, contentDescription = "Home")
+                launchSingleTop = true
+                restoreState = true
             }
-            Spacer(modifier = Modifier.weight(0.6f))
-            IconButton(onClick = {
-                if (currentDestinationRoute != NavRoutes.Offline) {
-                    navController.navigate(NavRoutes.Offline) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            }) {
-                Icon(Icons.Default.Star, contentDescription = "Favorites", tint = if (isDark) Color.Black else Color.White)
-            }
-            Spacer(modifier = Modifier.weight(0.2f))
         }
-    )
+    }
+
+    val onOfflineClick = {
+        if (currentDestinationRoute != NavRoutes.Offline) {
+            navController.navigate(NavRoutes.Offline) {
+                popUpTo(navController.graph.startDestinationId) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
+    }
+
+    if (isDark) {
+        BottomAppBar(
+            containerColor = Color(0xFF0F172A),
+//            contentColor = if(isDark) Color.White else Color(0xFFDCDCDC),
+            contentColor = Color.White,
+            actions = {
+                Spacer(modifier = Modifier.weight(0.2f))
+                IconButton(onClick = {
+                    onHomeClick()
+                }) {
+                    Icon(Icons.Default.Home, contentDescription = "Home", tint = if (currentDestinationRoute == NavRoutes.Home) Color.Yellow else Color.White)
+                }
+                Spacer(modifier = Modifier.weight(0.6f))
+                IconButton(onClick = {
+                    onOfflineClick()
+                }) {
+                    Icon(Icons.Default.Star, contentDescription = "Favorites", tint = if (currentDestinationRoute == NavRoutes.Offline) Color.Yellow else Color.White)
+                }
+                Spacer(modifier = Modifier.weight(0.2f))
+            }
+        )
+    }
+    else {
+        BottomAppBar(
+            containerColor = Color(0xFFF0F0F0),
+//            contentColor = if(isDark) Color.White else Color(0xFFDCDCDC),
+            contentColor = Color(0xFF959595),
+            actions = {
+                Spacer(modifier = Modifier.weight(0.2f))
+                IconButton(onClick = {
+                    onHomeClick()
+                }) {
+                    Icon(Icons.Default.Home, contentDescription = "Home", tint = if (currentDestinationRoute == NavRoutes.Home) Color.Black else Color(0xFF959595))
+                }
+                Spacer(modifier = Modifier.weight(0.6f))
+                IconButton(onClick = {
+                    onOfflineClick()
+                }) {
+                    Icon(Icons.Default.Star, contentDescription = "Favorites", tint = if (currentDestinationRoute == NavRoutes.Offline) Color.Black else Color(0xFF959595))
+                }
+                Spacer(modifier = Modifier.weight(0.2f))
+            }
+        )
+    }
+
 }
 
 
