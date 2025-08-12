@@ -25,7 +25,7 @@
 
 ## 🚀 Install / Download
 **Download the latest signed APK:**  
-[![Download APK](https://img.shields.io/badge/Download%20APK-Latest-blue?style=for-the-badge)](https://github.com/Prashant-Sgh/APOD/releases/latest)
+[![Download APK](https://img.shields.io/badge/Download%20APK-Latest-blue?style=for-the-badge)](https://github.com/Prashant-Sgh/APOD/releases/download/v1.0.0/app-release.apk)
 
 **Build from source (developer):**
 1. `git clone https://github.com/Prashant-Sgh/APOD.git`  
