@@ -74,3 +74,11 @@ Thanks — contributions welcome!
 - ✅ Put `NASA_API_KEY` in `local.properties` (with no quotes).  
 
 ---
+
+## 📡 Data Source & Attribution
+
+This app uses data and images from NASA’s [Astronomy Picture of the Day (APOD) API](https://api.nasa.gov/).  
+All image rights remain with their respective owners as credited by NASA on the APOD website.
+
+> **Disclaimer:** This project is for educational and portfolio purposes only.  
+> Images may be subject to copyright by third parties — please check credits on each APOD page before reuse.
