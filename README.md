@@ -5,6 +5,8 @@
 
 *A simple, fast Android app to browse NASA’s Astronomy Picture of the Day (APOD) — save for offline, toggle theme, and enjoy a clean Jetpack Compose UI.*
 
+<img src="screenshots/SkyDiary.gif" alt="App preview" width="200">
+
 ---
 
 ## Badges
